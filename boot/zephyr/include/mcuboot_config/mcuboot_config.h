@@ -9,6 +9,8 @@
 #ifndef __MCUBOOT_CONFIG_H__
 #define __MCUBOOT_CONFIG_H__
 
+#include <zephyr/devicetree.h>
+
 /*
  * This file is also included by the simulator, but we don't want to
  * define anything here in simulator builds.
@@ -231,6 +233,15 @@
 
 #else
 #define MCUBOOT_MAX_IMG_SECTORS       128
+#endif
+
+/* Support 32-byte aligned flash sizes */
+
+#if DT_HAS_CHOSEN(zephyr_flash)
+    #if DT_PROP_OR(DT_CHOSEN(zephyr_flash), write_block_size, 0) > 8
+        #define MCUBOOT_BOOT_MAX_ALIGN \
+            DT_PROP(DT_CHOSEN(zephyr_flash), write_block_size)
+    #endif
 #endif
 
 #endif /* !__BOOTSIM__ */
